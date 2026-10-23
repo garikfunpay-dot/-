@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Python с нуля</title>
+<style>
+  :root {
+    --bg: #03110a;
+    --card: #0b2316;
+    --line: rgba(57, 255, 136, 0.25);
+    --accent: #39ff88;
+    --accent-2: #00c46a;
+    --text: #e9fff3;
+    --muted: #8fbfa3;
+    --code: #06190f;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text);
+    font-family: -apple-system, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  #app { display: flex; flex-direction: column; height: 100%; }
+  .progress { height: 4px; background: rgba(57, 255, 136, 0.15); }
+  .progress div { height: 100%; width: 0; background: linear-gradient(90deg, var(--accent-2), var(--accent));
+    box-shadow: 0 0 12px var(--accent); transition: width .3s; }
+  .stage { flex: 1; overflow-y: auto; padding: 24px 20px 12px; }
+  .slide { display: none; max-width: 720px; margin: 0 auto; animation: rise .35s ease; }
+  .slide.active { display: block; }
+  @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  .kicker { color: var(--accent); font-size: 13px; letter-spacing: 3px; text-transform: uppercase; font-weight: 700; }
+  h1 { font-size: 40px; line-height: 1.1; margin: 10px 0 14px; text-shadow: 0 0 24px rgba(57,255,136,.35); }
+  h2 { font-size: 30px; margin: 8px 0 14px; }
+  p, li { font-size: 18px; line-height: 1.55; color: #d6f5e1; }
+  ul { padding-left: 20px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 18px; margin: 16px 0;
+    box-shadow: 0 0 30px rgba(57,255,136,.08); }
+  .task { border-left: 4px solid var(--accent); }
+  .task b { color: var(--accent); }
+  pre { background: var(--code); border: 1px solid var(--line); border-radius: 14px; padding: 14px;
+    overflow-x: auto; font-size: 15px; line-height: 1.5; color: #b9ffd3; margin: 12px 0;
+    font-family: ui-monospace, Menlo, monospace; }
+  details { margin-top: 12px; }
+  summary { cursor: pointer; color: var(--accent); font-weight: 600; padding: 10px 0; list-style: none; }
+  summary::-webkit-details-marker { display: none; }
+  summary::before { content: "▸ "; }
+  details[open] summary::before { content: "▾ "; }
+  .hero { text-align: center; padding-top: 40px; }
+  .hero .big { font-size: 84px; filter: drop-shadow(0 0 24px rgba(57,255,136,.6)); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .tile { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 14px; }
+  .tile b { display: block; color: var(--accent); margin-bottom: 4px; }
+  .tile span { font-size: 15px; color: var(--muted); line-height: 1.4; }
+  .quiz .q { margin: 18px 0; }
+  .quiz .q h3 { font-size: 18px; margin: 0 0 8px; }
+  label.opt { display: flex; align-items: center; gap: 10px; padding: 12px 14px; margin: 6px 0;
+    background: rgba(57,255,136,.06); border: 1px solid var(--line); border-radius: 12px; font-size: 16px; cursor: pointer; }
+  label.opt input { accent-color: var(--accent); width: 18px; height: 18px; }
+  .btn { display: inline-block; border: 0; border-radius: 14px; padding: 14px 22px; font-size: 16px; font-weight: 700;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2)); color: #03150c; cursor: pointer;
+    box-shadow: 0 0 22px rgba(57,255,136,.4); }
+  .btn.ghost { background: transparent; color: var(--accent); border: 1px solid var(--line); box-shadow: none; }
+  .result { text-align: center; padding: 26px; }
+  .score { font-size: 64px; font-weight: 800; color: var(--accent); text-shadow: 0 0 26px rgba(57,255,136,.6); }
+  nav { display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: #041a0e; }
+  nav .count { color: var(--muted); font-size: 14px; }
+  nav .btn { padding: 12px 18px; }
+  nav .btn:disabled { opacity: .35; box-shadow: none; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="progress"><div id="bar"></div></div>
+  <main class="stage">
+
+    <section class="slide active">
+      <div class="hero">
+        <div class="big">🐍</div>
+        <div class="kicker">Курс для начинающих</div>
+        <h1>Python с нуля</h1>
+        <p>Первые шаги в программировании на iPhone: от первого вывода текста до собственной мини-игры и итогового теста.</p>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">Знакомство</div>
+      <h2>Что такое Python</h2>
+      <p>Python это язык программирования. Его придумали так, чтобы код было легко читать, почти как обычный текст.</p>
+      <div class="grid">
+        <div class="tile"><b>Просто</b><span>Короткие понятные записи, мало лишнего.</span></div>
+        <div class="tile"><b>Универсально</b><span>Сайты, боты, игры, анализ данных.</span></div>
+        <div class="tile"><b>Популярно</b><span>Один из самых востребованных языков.</span></div>
+        <div class="tile"><b>Бесплатно</b><span>Язык и большинство инструментов не требуют оплаты.</span></div>
+      </div>
+      <p>Главный способ учиться: читать пример, понимать его и писать свой код. Не бойся ошибок, они помогают.</p>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">Инструменты</div>
+      <h2>Python на iPhone: что установить</h2>
+      <p>Компьютер не нужен. Код пишется и запускается прямо на телефоне.</p>
+      <div class="card">
+        <p><b>1. Pyto (рекомендуем)</b>, бесплатно в App Store. Python работает прямо на телефоне, интернет не нужен после установки.</p>
+        <p><b>2. Replit (через Safari)</b>, установка не нужна. Открой replit.com, создай бесплатный аккаунт, нажми Create Repl и выбери Python. Нужен интернет.</p>
+        <p><b>3. Pythonista</b>, платное приложение с одноразовой оплатой из App Store. Понадобится позже, если захочешь больше возможностей.</p>
+      </div>
+      <p>Совет: выбери одно приложение и не переключайся. Для курса хватит Pyto. Цены и названия могут меняться, проверь их в App Store.</p>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">Первый запуск</div>
+      <h2>Как запустить программу в Pyto</h2>
+      <div class="card">
+        <p><b>Шаг 1.</b> Установи Pyto из App Store и открой приложение.</p>
+        <p><b>Шаг 2.</b> Нажми на значок плюса и создай новый Python-файл.</p>
+        <p><b>Шаг 3.</b> Скопируй код из урока и вставь его в файл. Лучше набирать код самому: так быстрее запоминается.</p>
+        <p><b>Шаг 4.</b> Нажми кнопку «Play» (треугольник). Результат появится внизу экрана.</p>
+      </div>
+      <p>Если программа спрашивает ввод, например в input, отвечай прямо в окне вывода и нажимай Return на клавиатуре.</p>
+      <div class="grid">
+        <div class="tile"><b>Красная строка</b><span>Ошибка в коде. Читай последнюю строку сообщения: там номер строки и причина.</span></div>
+        <div class="tile"><b>Отступ</b><span>Внутри if, for и while код сдвигается на 4 пробела. Без этого будет ошибка.</span></div>
+        <div class="tile"><b>Кавычки</b><span>Текст пиши в кавычках. Если забыл закрыть кавычку, программа не запустится.</span></div>
+        <div class="tile"><b>Регистр</b><span>print и Print это разные слова. Python пишется строчными буквами.</span></div>
+      </div>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">Урок 1</div>
+      <h2>Первая программа</h2>
+      <p>Функция <b>print</b> выводит текст на экран. Текст в кавычках называется строкой.</p>
+      <pre><code>print("Привет, мир!")
+print("Я учусь программировать")</code></pre>
+      <div class="card task"><b>Задание.</b> Напиши программу, которая выводит твоё имя и слово «программист».</div>
+      <details><summary>Показать решение</summary>
+<pre><code>print("Меня зовут Аня")
+print("Я программист")</code></pre></details>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">Урок 2</div>
+      <h2>Переменные</h2>
+      <p>Переменная это коробка с именем, в которой хранится значение. Знак = кладёт значение в переменную.</p>
+      <pre><code>name = "Аня"
+age = 16
+print(name, "мне", age, "лет")
+print(type(age))</code></pre>
+      <p>Функция type показывает, какого типа значение: строка, целое число и так далее.</p>
+      <div class="card task"><b>Задание.</b> Создай переменные city (город) и year (год рождения). Выведи их одной строкой.</div>
+      <details><summary>Показать решение</summary>
+<pre><code>city = "Москва"
+year = 2008
+print(city, year)</code></pre></details>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">Урок 3</div>
+      <h2>Ввод с клавиатуры</h2>
+      <p>Функция <b>input</b> спрашивает у пользователя и возвращает то, что он ввёл. Ответ всегда строка, поэтому для чисел используем int.</p>
+      <pre><code>name = input("Как тебя зовут? ")
+print("Привет,", name)
+age = int(input("Сколько тебе лет? "))
+print("Через 10 лет тебе будет", age + 10)</code></pre>
+      <div class="card task"><b>Задание.</b> Спроси любимое число и выведи его, умноженное на 2.</div>
+      <details><summary>Показать решение</summary>
+<pre><code>number = int(input("Любимое число: "))
+print(number * 2)</code></pre></details>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">Урок 4</div>
+      <h2>Условия: if, elif, else</h2>
+      <p>Программа выбирает, какой код выполнить, в зависимости от условия. Важен отступ: 4 пробела внутри блока.</p>
+      <pre><code>age = int(input("Возраст: "))
+if age >= 18:
+    print("Взрослый")
+elif age >= 13:
+    print("Подросток")
+else:
+    print("Ребёнок")</code></pre>
+      <p>Знаки сравнения: == равно, != не равно, &gt;= больше или равно.</p>
+      <div class="card task"><b>Задание.</b> Спроси число и выведи, чётное оно или нечётное. Подсказка: остаток от деления n % 2.</div>
+      <details><summary>Показать решение</summary>
+<pre><code>n = int(input("Число: "))
+if n % 2 == 0:
+    print("Чётное")
+else:
+    print("Нечётное")</code></pre></details>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">Урок 5</div>
+      <h2>Цикл for</h2>
+      <p>Цикл повторяет код несколько раз. range(1, 6) даёт числа от 1 до 5.</p>
+      <pre><code>for i in range(1, 6):
+    print("Шаг", i)</code></pre>
+      <div class="card task"><b>Задание.</b> Выведи таблицу умножения на 7 от 7×1 до 7×10.</div>
+      <details><summary>Показать решение</summary>
+<pre><code>for i in range(1, 11):
+    print("7 x", i, "=", 7 * i)</code></pre></details>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">Урок 6</div>
+      <h2>Цикл while</h2>
+      <p>Цикл while повторяется, пока условие истинно. Не забывай менять переменную, иначе цикл не остановится.</p>
+      <pre><code>number = 1
+while number &lt;= 5:
+    print(number)
+    number = number + 1</code></pre>
+      <div class="card task"><b>Задание.</b> Посчитай сумму чисел от 1 до 100 с помощью while.</div>
+      <details><summary>Показать решение</summary>
+<pre><code>total = 0
+i = 1
+while i &lt;= 100:
+    total = total + i
+    i = i + 1
+print(total)</code></pre></details>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">Урок 7</div>
+      <h2>Списки</h2>
+      <p>Список хранит несколько значений сразу. Элементы нумеруются с нуля.</p>
+      <pre><code>fruits = ["яблоко", "банан", "груша"]
+fruits.append("киви")
+print(fruits[0])
+for fruit in fruits:
+    print(fruit)
+print(len(fruits))</code></pre>
+      <div class="card task"><b>Задание.</b> Дан список чисел [4, 17, 9, 23, 5]. Найди наибольшее число, перебрав список циклом.</div>
+      <details><summary>Показать решение</summary>
+<pre><code>numbers = [4, 17, 9, 23, 5]
+biggest = numbers[0]
+for n in numbers:
+    if n &gt; biggest:
+        biggest = n
+print(biggest)</code></pre></details>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">Урок 8</div>
+      <h2>Функции</h2>
+      <p>Функция это именованный кусок кода, который можно вызывать много раз. Ключевое слово def создаёт функцию, return возвращает результат.</p>
+      <pre><code>def greet(name):
+    return "Привет, " + name + "!"
+
+print(greet("Миша"))
+print(greet("Лена"))</code></pre>
+      <div class="card task"><b>Задание.</b> Напиши функцию square(x), которая возвращает квадрат числа, и вызови её для числа 7.</div>
+      <details><summary>Показать решение</summary>
+<pre><code>def square(x):
+    return x * x
+
+print(square(7))</code></pre></details>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">Урок 9</div>
+      <h2>Словари</h2>
+      <p>Словарь хранит пары «ключ — значение». Так удобно описывать объекты: человека, товар, игрока.</p>
+      <pre><code>student = {"имя": "Лена", "балл": 5}
+print(student["имя"])
+student["балл"] = 4
+print(student)</code></pre>
+      <div class="card task"><b>Задание.</b> Создай словарь о себе с полями имя и город. Выведи город.</div>
+      <details><summary>Показать решение</summary>
+<pre><code>me = {"имя": "Аня", "город": "Казань"}
+print(me["город"])</code></pre></details>
+    </section>
+
+    <section class="slide">
+      <div class="kicker">Мини-проект</div>
+      <h2>Угадай число</h2>
+      <p>Соберём всё вместе: переменные, ввод, условия и цикл. Компьютер загадывает число от 1 до 10, а ты угадываешь.</p>
+      <pre><code>import random
+
+secret = random.randint(1, 10)
+while True:
+    guess = int(input("Угадай число от 1 до 10: "))
+    if guess == secret:
+        print("Верно!")
+        break
+    elif guess &gt; secret:
+        print("Меньше")
+    else:
+        print("Больше")</code></pre>
+      <div class="card task"><b>Задание.</b> Добавь счётчик попыток и выведи, сколько ходов понадобилось.</div>
+      <details><summary>Показать решение</summary>
+<pre><code>import random
+
+secret = random.randint(1, 10)
+attempts = 0
+while True:
+    guess = int(input("Угадай число от 1 до 10: "))
+    attempts = attempts + 1
+    if guess == secret:
+        print("Верно! Попыток:", attempts)
+        break
+    elif guess &gt; secret:
+        print("Меньше")
+    else:
+        print("Больше")</code></pre></details>
+    </section>
+
+    <section class="slide quiz">
+      <div class="kicker">Итог</div>
+      <h2>Тест: 10 вопросов</h2>
+      <p>За каждый правильный ответ — 10 баллов. Максимум 100.</p>
+      <div id="questions"></div>
+      <div class="result" id="result" style="display:none"></div>
+      <button class="btn" id="check">Проверить</button>
+      <button class="btn ghost" id="again" style="display:none;margin-left:8px">Пройти заново</button>
+    </section>
+
+  </main>
+  <nav>
+    <button class="btn ghost" id="prev">← Назад</button>
+    <span class="count" id="count"></span>
+    <button class="btn" id="next">Далее →</button>
+  </nav>
+</div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  let index = 0;
+  const bar = document.getElementById('bar');
+  const count = document.getElementById('count');
+  const prev = document.getElementById('prev');
+  const next = document.getElementById('next');
+
+  function show(i) {
+    index = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach((s, k) => s.classList.toggle('active', k === index));
+    document.querySelector('.stage').scrollTop = 0;
+    bar.style.width = ((index + 1) / slides.length * 100) + '%';
+    count.textContent = (index + 1) + ' / ' + slides.length;
+    prev.disabled = index === 0;
+    next.disabled = index === slides.length - 1;
+    next.textContent = index === slides.length - 2 ? 'К тесту →' : 'Далее →';
+    if (index === slides.length - 1) next.style.visibility = 'hidden'; else next.style.visibility = 'visible';
+  }
+  prev.onclick = () => show(index - 1);
+  next.onclick = () => show(index + 1);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') show(index + 1);
+    if (e.key === 'ArrowLeft') show(index - 1);
+  });
+  let touchX = null;
+  document.querySelector('.stage').addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+  document.querySelector('.stage').addEventListener('touchend', e => {
+    if (touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (dx < -60) show(index + 1);
+    if (dx > 60) show(index - 1);
+    touchX = null;
+  });
+
+  const QUESTIONS = [
+    { q: 'Какая функция выводит текст на экран?', o: ['print', 'input', 'show', 'echo'], a: 0 },
+    { q: 'Что возвращает input()?', o: ['число', 'строку', 'список', 'ничего'], a: 1 },
+    { q: 'Как записать число 5 в переменную x?', o: ['x == 5', 'x = 5', '5 = x', 'x: 5'], a: 1 },
+    { q: 'Чему равно print(2 + 3 * 2)?', o: ['10', '8', '12', '7'], a: 1 },
+    { q: 'Что выведет for i in range(3): print(i)?', o: ['1 2 3', '0 1 2', '0 1 2 3', '3'], a: 1 },
+    { q: 'Каким словом начинается условие?', o: ['when', 'if', 'check', 'once'], a: 1 },
+    { q: 'Как добавить элемент в конец списка?', o: ['add()', 'push()', 'append()', 'insert_end()'], a: 2 },
+    { q: 'Что такое def?', o: ['цикл', 'определение функции', 'переменная', 'комментарий'], a: 1 },
+    { q: 'Как получить значение по ключу «город» в словаре d?', o: ['d.city', 'd["город"]', 'd(город)', 'd.get_city'], a: 1 },
+    { q: 'Что означает знак # в Python?', o: ['комментарий', 'сложение', 'ошибка', 'цикл'], a: 0 }
+  ];
+
+  const box = document.getElementById('questions');
+  function renderQuiz() {
+    box.innerHTML = '';
+    QUESTIONS.forEach((item, qi) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'q';
+      wrap.innerHTML = '<h3>' + (qi + 1) + '. ' + item.q + '</h3>';
+      item.o.forEach((text, oi) => {
+        const label = document.createElement('label');
+        label.className = 'opt';
+        label.innerHTML = '<input type="radio" name="q' + qi + '" value="' + oi + '"> ' + text;
+        wrap.appendChild(label);
+      });
+      box.appendChild(wrap);
+    });
+    document.getElementById('result').style.display = 'none';
+    document.getElementById('check').style.display = '';
+    document.getElementById('again').style.display = 'none';
+  }
+
+  document.getElementById('check').onclick = () => {
+    let score = 0;
+    let answered = 0;
+    QUESTIONS.forEach((item, qi) => {
+      const chosen = document.querySelector('input[name="q' + qi + '"]:checked');
+      if (chosen) answered++;
+      if (chosen && Number(chosen.value) === item.a) score++;
+    });
+    if (answered < QUESTIONS.length) {
+      alert('Ответь на все вопросы: осталось ' + (QUESTIONS.length - answered));
+      return;
+    }
+    const points = score * 10;
+    let grade = 'Повтори темы и попробуй ещё раз';
+    if (points >= 90) grade = 'Отлично! Ты готов к следующему уровню';
+    else if (points >= 60) grade = 'Хорошо! Пересмотри уроки, где были ошибки';
+    const res = document.getElementById('result');
+    res.innerHTML = '<div class="score">' + points + ' / 100</div>' +
+      '<p>Правильных ответов: ' + score + ' из ' + QUESTIONS.length + '</p>' +
+      '<p><b>' + grade + '</b></p>';
+    res.style.display = 'block';
+    document.getElementById('check').style.display = 'none';
+    document.getElementById('again').style.display = '';
+    res.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+  document.getElementById('again').onclick = renderQuiz;
+
+  renderQuiz();
+  show(0);
+</script>
+</body>
+</html>
